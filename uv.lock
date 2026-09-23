@@ -750,6 +750,7 @@ name = "pyrig-codeql"
 version = "0.1.0"
 source = { editable = "." }
 dependencies = [
+    { name = "pyrig" },
     { name = "pyrig-runtime" },
 ]
 
@@ -784,7 +785,10 @@ dev = [
 ]
 
 [package.metadata]
-requires-dist = [{ name = "pyrig-runtime", specifier = ">=3.23.47" }]
+requires-dist = [
+    { name = "pyrig", specifier = ">=18.85.4" },
+    { name = "pyrig-runtime", specifier = ">=3.23.47" },
+]
 
 [package.metadata.requires-dev]
 dev = [
