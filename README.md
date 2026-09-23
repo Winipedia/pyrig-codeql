@@ -45,3 +45,29 @@
 > A pyrig plugin that integrates GitHub CodeQL.
 
 ---
+
+## Overview
+
+`pyrig-codeql` is a [pyrig](https://github.com/Winipedia/pyrig) plugin that adds
+GitHub CodeQL analysis to your project's health-check workflow.
+
+## What it adds
+
+- **CodeQL analysis** — analyzes Python and GitHub Actions code.
+- **Health-check integration** — adds CodeQL to the aggregate health-check gate.
+
+## Usage
+
+Add the plugin as a development dependency, then synchronize your project:
+
+```bash
+uv add pyrig-codeql --dev
+uv run pyrig sync
+```
+
+The plugin requires Python 3.12 or newer.
+
+## Documentation
+
+Full documentation, including the auto-generated API reference, is available on
+the [documentation site](https://Winipedia.github.io/pyrig-codeql).

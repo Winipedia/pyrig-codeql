@@ -45,3 +45,44 @@
 > A pyrig plugin that integrates GitHub CodeQL.
 
 ---
+
+## Overview
+
+`pyrig-codeql` is a [pyrig](https://github.com/Winipedia/pyrig) plugin that
+extends pyrig's generated GitHub Actions health-check workflow with a CodeQL
+analysis job. Install it as a development dependency, then run `pyrig sync`;
+plugin discovery applies the override automatically.
+
+```bash
+uv add pyrig-codeql --dev
+uv run pyrig sync
+```
+
+## Analysis job
+
+The plugin adds an `analyze` job to the generated health-check workflow. Its
+matrix runs two independent analyses:
+
+| Language | Scope |
+| --- | --- |
+| `python` | Python source code |
+| `actions` | GitHub Actions workflow files |
+
+Each matrix job checks out the repository, initializes CodeQL, and performs the
+analysis. The initialization step uses advanced setup with:
+
+- `build-mode: none`, because neither analyzed language requires compilation;
+- `queries: security-and-quality`, which is the strictest setting available.
+
+The analysis step uploads the results to GitHub code scanning. Findings reported
+by CodeQL do not make the action step fail; failures to run the analysis still
+fail the job.
+
+The `analyze` job is added to the aggregate `health-check` job's `needs` list.
+As a result, the aggregate health check waits for CodeQL as well as the normal
+project checks and remains the workflow's release gate.
+
+## API Reference
+
+For class- and method-level details, see the [API Reference](api.md), generated
+automatically from the source.
