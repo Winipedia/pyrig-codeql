@@ -42,6 +42,6 @@
 
 ---
 
-> Add your description here
+> A pyrig plugin that integrates GitHub CodeQL.
 
 ---

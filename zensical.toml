@@ -1,6 +1,6 @@
 [project]
 site_name = "pyrig-codeql"
-site_description = "Add your description here"
+site_description = "A pyrig plugin that integrates GitHub CodeQL."
 site_url = "https://Winipedia.github.io/pyrig-codeql"
 repo_url = "https://github.com/Winipedia/pyrig-codeql"
 edit_uri = "edit/main/docs"

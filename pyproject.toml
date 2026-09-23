@@ -1,7 +1,7 @@
 [project]
 name = "pyrig-codeql"
 version = "0.1.0"
-description = "Add your description here"
+description = "A pyrig plugin that integrates GitHub CodeQL."
 readme = "README.md"
 requires-python = ">=3.12"
 license = "MIT"

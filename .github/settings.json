@@ -1,7 +1,7 @@
 {
   "repository": {
     "name": "pyrig-codeql",
-    "description": "Add your description here",
+    "description": "A pyrig plugin that integrates GitHub CodeQL.",
     "homepage": "https://Winipedia.github.io/pyrig-codeql",
     "default_branch": "main",
     "delete_branch_on_merge": true,
