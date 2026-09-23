@@ -1,6 +1,6 @@
 [project]
 name = "pyrig-codeql"
-version = "1.0.0"
+version = "1.0.2"
 description = "A pyrig plugin that integrates GitHub CodeQL."
 readme = "README.md"
 requires-python = ">=3.12"
@@ -52,6 +52,7 @@ dev = [
   "pyflakes>=4.0.0",
   "pyrig>=18.86.0",
   "pyrig-codecov>=3.17.33",
+  "pyrig-codeql",
   "pyrig-fixtures>=2.24.61",
   "pyrig-pypi>=3.20.30",
   "pytest>=9.1.1",
@@ -121,3 +122,6 @@ select = [
 
 [tool.ruff.lint.pydocstyle]
 convention = "google"
+
+[tool.uv.sources]
+pyrig-codeql = { workspace = true }

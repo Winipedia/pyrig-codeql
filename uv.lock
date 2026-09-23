@@ -747,7 +747,7 @@ wheels = [
 
 [[package]]
 name = "pyrig-codeql"
-version = "1.0.0"
+version = "1.0.2"
 source = { editable = "." }
 dependencies = [
     { name = "pyrig" },
@@ -766,6 +766,7 @@ dev = [
     { name = "pyflakes" },
     { name = "pyrig" },
     { name = "pyrig-codecov" },
+    { name = "pyrig-codeql" },
     { name = "pyrig-fixtures" },
     { name = "pyrig-pypi" },
     { name = "pytest" },
@@ -802,6 +803,7 @@ dev = [
     { name = "pyflakes", specifier = ">=4.0.0" },
     { name = "pyrig", specifier = ">=18.86.0" },
     { name = "pyrig-codecov", specifier = ">=3.17.33" },
+    { name = "pyrig-codeql", editable = "." },
     { name = "pyrig-fixtures", specifier = ">=2.24.61" },
     { name = "pyrig-pypi", specifier = ">=3.20.30" },
     { name = "pytest", specifier = ">=9.1.1" },
