@@ -1,0 +1,121 @@
+---
+"name": "Health Check"
+"on":
+  "pull_request":
+    "types":
+      - "opened"
+      - "synchronize"
+      - "reopened"
+  "schedule":
+    -
+      "cron": "0 1 * * *"
+  "workflow_call":
+    "secrets":
+      "CODECOV_TOKEN":
+        "required": true
+"permissions": {}
+"concurrency":
+  "group": "Health Check-${{ github.ref }}"
+  "cancel-in-progress": true
+"defaults":
+  "run":
+    "shell": "bash"
+"env":
+  "PYTHONDONTWRITEBYTECODE": 1
+  "UV_NO_SYNC": 1
+"run-name": "Health Check"
+"jobs":
+  "health-checks":
+    "name": "Health Checks"
+    "permissions":
+      "contents": "read"
+    "runs-on": "ubuntu-latest"
+    "steps":
+      -
+        "name": "Checkout Repository"
+        "id": "checkout-repository"
+        "uses": "actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1"  # v7.0.1
+        "with":
+          "persist-credentials": false
+      -
+        "name": "Setup Package Manager"
+        "id": "setup-package-manager"
+        "uses": "astral-sh/setup-uv@bec219d24cd3e171d82865faccec33120bb574f4"  # v10.1.0
+        "with":
+          "python-version": "3.14"
+      -
+        "name": "Update Dependencies"
+        "id": "update-dependencies"
+        "run": "uv lock --upgrade"
+      -
+        "name": "Install Dependencies"
+        "id": "install-dependencies"
+        "run": "uv sync"
+      -
+        "name": "Run Version Control Hooks"
+        "id": "run-version-control-hooks"
+        "run": "uv run prek run --all-files --group=all"
+        "env":
+          "GH_TOKEN": "${{ secrets.GITHUB_TOKEN }}"
+  "matrix-health-checks":
+    "name": "Matrix Health Checks"
+    "permissions":
+      "contents": "read"
+    "runs-on": "${{ matrix.os }}"
+    "strategy":
+      "matrix":
+        "os":
+          - "ubuntu-latest"
+          - "windows-latest"
+          - "macos-latest"
+        "python-version":
+          - "3.12"
+          - "3.13"
+          - "3.14"
+      "fail-fast": true
+    "steps":
+      -
+        "name": "Checkout Repository"
+        "id": "checkout-repository"
+        "uses": "actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1"  # v7.0.1
+        "with":
+          "persist-credentials": false
+      -
+        "name": "Setup Package Manager"
+        "id": "setup-package-manager"
+        "uses": "astral-sh/setup-uv@bec219d24cd3e171d82865faccec33120bb574f4"  # v10.1.0
+        "with":
+          "python-version": "${{ matrix.python-version }}"
+      -
+        "name": "Update Dependencies"
+        "id": "update-dependencies"
+        "run": "uv lock --upgrade"
+      -
+        "name": "Install Dependencies"
+        "id": "install-dependencies"
+        "run": "uv sync"
+      -
+        "name": "Run Tests"
+        "id": "run-tests"
+        "run": "uv run pytest"
+      -
+        "name": "Upload Coverage Report"
+        "id": "upload-coverage-report"
+        "uses": "codecov/codecov-action@0b35c9ecc4f0529d0eb674914510c22f85b196b4"  # v7.1.0
+        "with":
+          "files": "coverage.xml"
+          "token": "${{ secrets.CODECOV_TOKEN }}"
+          "fail_ci_if_error": "true"
+          "skip_validation": "true"
+  "health-check":
+    "name": "Health Check"
+    "needs":
+      - "health-checks"
+      - "matrix-health-checks"
+    "runs-on": "ubuntu-latest"
+    "steps":
+      -
+        "name": "Aggregate Jobs"
+        "id": "aggregate-jobs"
+        "run": "echo 'Aggregating jobs into one job.'"
+...

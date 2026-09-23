@@ -1,0 +1,76 @@
+---
+"name": "Release"
+"on":
+  "push":
+    "branches":
+      - "main"
+"permissions": {}
+"concurrency":
+  "group": "Release-${{ github.ref }}"
+  "cancel-in-progress": false
+"defaults":
+  "run":
+    "shell": "bash"
+"env":
+  "PYTHONDONTWRITEBYTECODE": 1
+  "UV_NO_SYNC": 1
+"run-name": "Release"
+"jobs":
+  "health-check":
+    "name": "Health Check"
+    "permissions":
+      "contents": "read"
+    "uses": "$/.github/workflows/health_check.yml"
+    "secrets":
+      "CODECOV_TOKEN": "${{ secrets.CODECOV_TOKEN }}"
+  "publish":
+    "name": "Publish"
+    "permissions":
+      "contents": "write"  # required
+    "needs":
+      - "health-check"
+    "runs-on": "ubuntu-latest"
+    "steps":
+      -
+        "name": "Checkout Repository"
+        "id": "checkout-repository"
+        "uses": "actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1"  # v7.0.1
+        "with":
+          "persist-credentials": false
+      -
+        "name": "Setup Package Manager"
+        "id": "setup-package-manager"
+        "uses": "astral-sh/setup-uv@bec219d24cd3e171d82865faccec33120bb574f4"  # v10.1.0
+        "with":
+          "python-version": "3.14"
+      -
+        "name": "Extract Version"
+        "id": "extract-version"
+        "run": |-
+          VERSION="$(uv version --short)"
+          echo version="${VERSION}" >> "${GITHUB_OUTPUT}"
+      -
+        "name": "Create Release"
+        "id": "create-release"
+        "run": |-
+          gh \
+          release \
+          create \
+          "${VERSION}" \
+          --title="${VERSION}" \
+          --generate-notes
+        "env":
+          "GH_TOKEN": "${{ secrets.GITHUB_TOKEN }}"
+          "VERSION": "${{ steps.extract-version.outputs.version }}"
+  "deploy":
+    "name": "Deploy"
+    "permissions":
+      "contents": "read"
+      "id-token": "write"  # required
+      "pages": "write"  # required
+    "needs":
+      - "publish"
+    "uses": "$/.github/workflows/deploy.yml"
+    "secrets":
+      "REPO_TOKEN": "${{ secrets.REPO_TOKEN }}"
+...

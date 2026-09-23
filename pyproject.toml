@@ -1,0 +1,122 @@
+[project]
+name = "pyrig-codeql"
+version = "0.1.0"
+description = "Add your description here"
+readme = "README.md"
+requires-python = ">=3.12"
+license = "MIT"
+license-files = [
+  "LICENSE",
+]
+authors = [
+  { name = "Winipedia", email = "winipedia@gmx.de" },
+]
+maintainers = [
+  { name = "Winipedia", email = "winipedia@gmx.de" },
+]
+keywords = [
+  "pyrig",
+]
+classifiers = [
+  "Operating System :: OS Independent",
+  "Programming Language :: Python :: 3 :: Only",
+  "Programming Language :: Python :: 3.12",
+  "Programming Language :: Python :: 3.13",
+  "Programming Language :: Python :: 3.14",
+  "Typing :: Typed",
+]
+dependencies = [
+  "pyrig-runtime>=3.23.47",
+]
+
+[project.urls]
+Changelog = "https://github.com/Winipedia/pyrig-codeql/releases"
+Documentation = "https://Winipedia.github.io/pyrig-codeql"
+Homepage = "https://github.com/Winipedia/pyrig-codeql"
+Issues = "https://github.com/Winipedia/pyrig-codeql/issues"
+Source = "https://github.com/Winipedia/pyrig-codeql"
+
+[project.scripts]
+pyrig-codeql = "pyrig_runtime.rig.cli.main:main"
+
+[dependency-groups]
+dev = [
+  "actionlint-py>=1.7.12.25",
+  "bandit>=1.9.4",
+  "deptry>=0.25.1",
+  "detect-secrets>=1.5.0",
+  "mkdocstrings[python]>=1.0.6",
+  "pre-commit-hooks>=6.0.0",
+  "prek>=0.5.3",
+  "pyflakes>=4.0.0",
+  "pyrig>=18.85.4",
+  "pyrig-codecov>=3.17.33",
+  "pyrig-fixtures>=2.24.61",
+  "pyrig-pypi>=3.20.30",
+  "pytest>=9.1.1",
+  "pytest-cov>=7.1.0",
+  "pytest-randomly>=5.0.0",
+  "pytest-xdist>=3.8.0",
+  "ruff>=0.16.8",
+  "rumdl>=0.2.77",
+  "ryl>=0.22.0",
+  "shellcheck-py>=0.11.0.1",
+  "shfmt-py>=4.2.0",
+  "tombi>=1.5.5",
+  "ty>=0.0.83",
+  "typos>=1.50.2",
+  "zensical>=0.0.64",
+  "zizmor>=1.30.1",
+]
+
+[build-system]
+requires = [
+  "uv-build",
+]
+build-backend = "uv_build"
+
+[tool.deptry]
+root = "src"
+
+[tool.deptry.per_rule_ignores]
+DEP002 = [
+  "pyrig-runtime",
+]
+
+[tool.pytest]
+addopts = [
+  "--cov-branch",
+  "--cov-fail-under=100",
+  "--cov-report=term-missing:skip-covered",
+  "--cov-report=xml",
+  "--cov=pyrig_codeql",
+  "--dist=worksteal",
+  "--numprocesses=auto",
+  "--report-chars=a",
+]
+filterwarnings = [
+  "error",
+]
+strict = true
+testpaths = [
+  "tests",
+]
+
+[tool.ruff.format]
+docstring-code-format = true
+
+[tool.ruff.lint]
+ignore = [
+  "CPY001",
+]
+select = [
+  "ALL",
+]
+
+[tool.ruff.lint.per-file-ignores]
+"tests/**/*.py" = [
+  "S101",
+]
+
+[tool.ruff.lint.pydocstyle]
+convention = "google"
