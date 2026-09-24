@@ -50,7 +50,7 @@ class TestHealthCheckWorkflowConfigFile:
         assert step_ids == [
             "checkout-repository",
             "initialize-codeql",
-            "perform-codeql-analysis",
+            "analyze-code",
         ]
 
     def test_codeql_init_action(self) -> None:
@@ -80,12 +80,11 @@ class TestHealthCheckWorkflowConfigFile:
         step = HealthCheckWorkflowConfigFile.I.step_initialize_codeql()
         assert step["with"] == {
             "languages": "${{ matrix.language }}",
-            "build-mode": "none",
-            "queries": "security-and-quality",
+            "config-file": ".github/codeql.yml",
         }
 
-    def test_step_perform_codeql_analysis(self) -> None:
+    def test_step_analyze_code(self) -> None:
         """Test method."""
-        step = HealthCheckWorkflowConfigFile.I.step_perform_codeql_analysis()
+        step = HealthCheckWorkflowConfigFile.I.step_analyze_code()
         assert "uses" in step
         assert "with" not in step

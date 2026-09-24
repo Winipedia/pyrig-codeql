@@ -69,10 +69,11 @@ matrix runs two independent analyses:
 | `actions` | GitHub Actions workflow files |
 
 Each matrix job checks out the repository, initializes CodeQL, and performs the
-analysis. The initialization step uses advanced setup with:
+analysis. The initialization step uses the repository's `.github/codeql.yml`
+configuration with:
 
-- `build-mode: none`, because neither analyzed language requires compilation;
-- `queries: security-and-quality`, which is the strictest setting available.
+- the `security-and-quality` query suite, the strictest built-in suite;
+- `paths-ignore: ["tests/**"]`, so test-only code is excluded from analysis.
 
 The analysis step uploads the results to GitHub code scanning. Findings reported
 by CodeQL do not make the action step fail; failures to run the analysis still

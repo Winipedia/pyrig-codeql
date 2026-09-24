@@ -8,6 +8,9 @@ from pyrig.rig.configs.version_control.remote.workflows.health_check import (
 )
 
 from pyrig_codeql.rig import resources
+from pyrig_codeql.rig.configs.version_control.remote.code_analyzer import (
+    CodeAnalyzerConfigFile,
+)
 
 
 class HealthCheckWorkflowConfigFile(BaseHealthCheckWorkflowConfigFile):
@@ -66,17 +69,14 @@ class HealthCheckWorkflowConfigFile(BaseHealthCheckWorkflowConfigFile):
         return [
             self.step_checkout_repository(),
             self.step_initialize_codeql(),
-            self.step_perform_codeql_analysis(),
+            self.step_analyze_code(),
         ]
 
     def step_initialize_codeql(self) -> dict[str, Any]:
         """Build a step that initializes the CodeQL database.
 
         Neither analyzed language is compiled, so no build step is
-        required between initialization and analysis. Runs the
-        `security-and-quality` query suite, the strictest built-in suite,
-        which is only available via advanced setup, not the default-setup
-        API (whose `query_suite` field is limited to `default`/`extended`).
+        required between initialization and analysis.
 
         Returns:
             Step using `github/codeql-action/init@<ref>`.
@@ -86,12 +86,11 @@ class HealthCheckWorkflowConfigFile(BaseHealthCheckWorkflowConfigFile):
             uses=self.codeql_init_action(),
             with_={
                 "languages": self.insert_expression("matrix.language"),
-                "build-mode": "none",
-                "queries": "security-and-quality",
+                "config-file": CodeAnalyzerConfigFile.I.path().as_posix(),
             },
         )
 
-    def step_perform_codeql_analysis(self) -> dict[str, Any]:
+    def step_analyze_code(self) -> dict[str, Any]:
         """Build a step that runs the CodeQL analysis and uploads results.
 
         Fails the job if the analysis itself fails to run; code scanning
@@ -101,7 +100,7 @@ class HealthCheckWorkflowConfigFile(BaseHealthCheckWorkflowConfigFile):
             Step using `github/codeql-action/analyze@<ref>`.
         """
         return self.step(
-            self.step_perform_codeql_analysis,
+            self.step_analyze_code,
             uses=self.codeql_analyze_action(),
         )
 

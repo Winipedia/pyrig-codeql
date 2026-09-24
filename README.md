@@ -55,6 +55,8 @@ GitHub CodeQL analysis to your project's health-check workflow.
 
 - **CodeQL analysis** — analyzes Python and GitHub Actions code.
 - **Health-check integration** — adds CodeQL to the aggregate health-check gate.
+- **Source-only analysis** — excludes the project's `tests/` directory from
+  CodeQL analysis.
 
 ## Usage
 
