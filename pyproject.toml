@@ -1,6 +1,6 @@
 [project]
 name = "pyrig-codeql"
-version = "1.1.10"
+version = "1.1.11"
 description = "A pyrig plugin that integrates GitHub CodeQL."
 readme = "README.md"
 requires-python = ">=3.12"
@@ -54,6 +54,7 @@ dev = [
   "pyrig-codecov>=3.17.33",
   "pyrig-codeql",
   "pyrig-fixtures>=2.24.61",
+  "pyrig-public>=1.0.1",
   "pyrig-pypi>=3.20.30",
   "pytest>=9.1.1",
   "pytest-cov>=7.1.0",
