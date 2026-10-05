@@ -1,6 +1,6 @@
 [project]
 name = "pyrig-codeql"
-version = "1.1.20"
+version = "1.1.25"
 description = "A pyrig plugin that integrates GitHub CodeQL."
 readme = "README.md"
 requires-python = ">=3.12"
@@ -27,7 +27,6 @@ classifiers = [
 ]
 dependencies = [
   "pyrig>=18.86.0",
-  "pyrig-runtime>=3.23.47",
 ]
 
 [project.urls]
@@ -51,6 +50,7 @@ dev = [
   "prek>=0.5.3",
   "pyflakes>=4.0.0",
   "pyrig-opensource>=1.0.0",
+  "pyrig-plugin>=0.1.0",
   "pyrig-pypi>=3.20.30",
   "pytest>=9.1.1",
   "pytest-cov>=7.1.0",
@@ -79,7 +79,7 @@ root = "src"
 
 [tool.deptry.per_rule_ignores]
 DEP002 = [
-  "pyrig-runtime",
+  "pyrig",
 ]
 
 [tool.pytest]
