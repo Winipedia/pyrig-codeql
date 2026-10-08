@@ -7,7 +7,7 @@ from pyrig_codeql.rig.configs.version_control.remote.code_analyzer import (
 )
 
 _CONFIG_FILE_OVERRIDES = (
-    ConfigFile._configs,
+    ConfigFile._configs,  # noqa: SLF001
     ConfigFile.parent_path,
     ConfigFile.stem,
 )
