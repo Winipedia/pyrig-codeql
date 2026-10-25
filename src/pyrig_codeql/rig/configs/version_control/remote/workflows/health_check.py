@@ -1,4 +1,4 @@
-"""Health check workflow extended with a CodeQL analysis job."""
+"""Health check workflow extended with CodeQL analysis and an open-alert gate."""
 
 from types import MethodType
 from typing import Any
@@ -6,6 +6,7 @@ from typing import Any
 from pyrig.rig.configs.version_control.remote.workflows.health_check import (
     HealthCheckWorkflowConfigFile as BaseHealthCheckWorkflowConfigFile,
 )
+from pyrig.rig.tools.version_control.remote.controller import RemoteVersionController
 
 from pyrig_codeql.rig import resources
 from pyrig_codeql.rig.configs.version_control.remote.code_analyzer import (
@@ -14,7 +15,7 @@ from pyrig_codeql.rig.configs.version_control.remote.code_analyzer import (
 
 
 class HealthCheckWorkflowConfigFile(BaseHealthCheckWorkflowConfigFile):
-    """Health check workflow extended with a CodeQL analysis job."""
+    """Add CodeQL analysis and an open-alert gate to the health check workflow."""
 
     def jobs(self) -> dict[str, Any]:
         """Return the base class's jobs, extended with the CodeQL analysis job.
@@ -43,8 +44,8 @@ class HealthCheckWorkflowConfigFile(BaseHealthCheckWorkflowConfigFile):
 
         Returns:
             Job configuration with a matrix over `("python", "actions")`,
-            the permissions CodeQL needs to build a database and upload its
-            results, and the analysis steps.
+            the permissions needed to analyze code, upload results, and read
+            alerts, and steps that fail the job on open CodeQL alerts.
         """
         return self.job(
             self.job_analyze,
@@ -64,12 +65,13 @@ class HealthCheckWorkflowConfigFile(BaseHealthCheckWorkflowConfigFile):
 
         Returns:
             Steps that check out the repository, initialize CodeQL for the
-            current matrix language, and run the analysis.
+            current matrix language, run the analysis, and check open alerts.
         """
         return [
             self.step_checkout_repository(),
             self.step_initialize_codeql(),
             self.step_analyze_code(),
+            self.step_check_alerts(),
         ]
 
     def step_initialize_codeql(self) -> dict[str, Any]:
@@ -93,15 +95,31 @@ class HealthCheckWorkflowConfigFile(BaseHealthCheckWorkflowConfigFile):
     def step_analyze_code(self) -> dict[str, Any]:
         """Build a step that runs the CodeQL analysis and uploads results.
 
-        Fails the job if the analysis itself fails to run; code scanning
-        alerts found by the analysis do not fail the step.
-
         Returns:
             Step using `github/codeql-action/analyze@<ref>`.
         """
         return self.step(
             self.step_analyze_code,
             uses=self.codeql_analyze_action(),
+        )
+
+    def step_check_alerts(self) -> dict[str, Any]:
+        """Fail if the analyzed ref has any open CodeQL alerts.
+
+        Returns:
+            GitHub CLI step authenticated with the workflow's GitHub token.
+        """
+        return self.step(
+            self.step_check_alerts,
+            run=RemoteVersionController.I.api_method_args(
+                '--raw-field="ref=${GITHUB_REF}"',
+                "--raw-field=state=open",
+                "--raw-field=tool_name=CodeQL",
+                """--jq='if . != [] then error("Alerts found") end'""",
+                endpoint='"repos/${GITHUB_REPOSITORY}/code-scanning/alerts"',
+                method="GET",
+            ).multiline(),
+            env={"GH_TOKEN": self.insert_expression("secrets.GITHUB_TOKEN")},
         )
 
     def codeql_init_action(self) -> tuple[str, str, str]:

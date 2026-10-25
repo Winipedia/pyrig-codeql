@@ -58,6 +58,9 @@ GitHub CodeQL analysis to your project's health-check workflow.
 
 - **CodeQL analysis** — analyzes Python and GitHub Actions code.
 - **Health-check integration** — adds CodeQL to the aggregate health-check gate.
+- **Alert gate** — fails the analysis job if the analyzed ref has any open
+  CodeQL security or quality alerts, including existing findings. Fixed and
+  dismissed alerts do not block the job.
 - **Source-only analysis** — excludes the project's `tests/` directory from
   CodeQL analysis.
 

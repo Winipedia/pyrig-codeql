@@ -64,7 +64,7 @@ uv run pyrig sync
 ## Analysis job
 
 The plugin adds an `analyze` job to the generated health-check workflow. Its
-matrix runs two independent analyses:
+matrix analyzes two languages:
 
 | Language | Scope |
 | --- | --- |
@@ -75,12 +75,16 @@ Each matrix job checks out the repository, initializes CodeQL, and performs the
 analysis. The initialization step uses the repository's `.github/codeql.yml`
 configuration with:
 
-- the `security-and-quality` query suite, the strictest built-in suite;
-- `paths-ignore: ["tests/**"]`, so test-only code is excluded from analysis.
+- the `security-and-quality` query suite, which includes security and
+  code-quality queries;
+- `paths-ignore` for the project's test package (`tests/**` in this repository),
+  so test-only code is excluded from analysis.
 
-The analysis step uploads the results to GitHub code scanning. Findings reported
-by CodeQL do not make the action step fail; failures to run the analysis still
-fail the job.
+The analysis step uploads the results to GitHub code scanning. The pinned
+action waits for processing by default; findings do not fail that step itself.
+A following API check fails the job if the analyzed ref has **any open CodeQL
+security or quality alerts**, at any severity, whether new or pre-existing.
+Fixed and dismissed alerts are excluded.
 
 The `analyze` job is added to the aggregate `health-check` job's `needs` list.
 As a result, the aggregate health check waits for CodeQL as well as the normal

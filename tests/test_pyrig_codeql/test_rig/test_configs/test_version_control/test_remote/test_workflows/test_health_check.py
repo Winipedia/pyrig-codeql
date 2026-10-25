@@ -1,5 +1,7 @@
 """Test module."""
 
+import shlex
+
 from pyrig.core.resources import resource_content
 from pyrig.core.strings import read_text_utf8
 
@@ -51,7 +53,11 @@ class TestHealthCheckWorkflowConfigFile:
             "checkout-repository",
             "initialize-codeql",
             "analyze-code",
+            "check-alerts",
         ]
+        assert (
+            HealthCheckWorkflowConfigFile.I.load()["jobs"]["analyze"]["steps"] == result
+        )
 
     def test_codeql_init_action(self) -> None:
         """Test method."""
@@ -88,3 +94,18 @@ class TestHealthCheckWorkflowConfigFile:
         step = HealthCheckWorkflowConfigFile.I.step_analyze_code()
         assert "uses" in step
         assert "with" not in step
+
+    def test_step_check_alerts(self) -> None:
+        """Test method."""
+        step = HealthCheckWorkflowConfigFile.I.step_check_alerts()
+        assert shlex.split(step["run"].replace("\\\n", "")) == [
+            "gh",
+            "api",
+            "repos/${GITHUB_REPOSITORY}/code-scanning/alerts",
+            "--method=GET",
+            "--raw-field=ref=${GITHUB_REF}",
+            "--raw-field=state=open",
+            "--raw-field=tool_name=CodeQL",
+            '--jq=if . != [] then error("Alerts found") end',
+        ]
+        assert step["env"] == {"GH_TOKEN": "${{ secrets.GITHUB_TOKEN }}"}
