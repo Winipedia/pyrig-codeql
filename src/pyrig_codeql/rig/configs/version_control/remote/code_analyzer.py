@@ -1,7 +1,7 @@
 """CodeQL configuration that restricts analysis to shipped source code."""
 
 from pathlib import Path
-from typing import Any
+from typing import Any, override
 
 from pyrig.rig.configs.base.yaml import YMLDictConfigFile
 from pyrig.rig.tools.testing.project import ProjectTester
@@ -16,14 +16,17 @@ class CodeAnalyzerConfigFile(YMLDictConfigFile):
     Manages `.github/codeql.yml`, including the query suite and ignored paths.
     """
 
+    @override
     def parent_path(self) -> Path:
         """Return GitHub's special repository configuration directory."""
         return RemoteVersionController.I.config_dir()
 
+    @override
     def stem(self) -> str:
         """Return `'codeql'`."""
         return "codeql"
 
+    @override
     def _configs(self) -> dict[str, Any]:
         """Build the CodeQL configuration.
 

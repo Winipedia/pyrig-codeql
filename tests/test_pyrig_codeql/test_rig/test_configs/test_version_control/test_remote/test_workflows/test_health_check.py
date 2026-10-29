@@ -14,10 +14,39 @@ from pyrig_codeql.rig.configs.version_control.remote.workflows.health_check impo
 class TestHealthCheckWorkflowConfigFile:
     """Test class."""
 
-    def test_jobs(self) -> None:
+    def test_codeql_analyze_action(self) -> None:
         """Test method."""
-        result = HealthCheckWorkflowConfigFile.I.jobs()
-        assert "analyze" in result, "Expected 'analyze' job"
+        assert HealthCheckWorkflowConfigFile.I.codeql_analyze_action() == tuple(
+            resource_content("CODEQL_ANALYZE_ACTION", resources).splitlines(),
+        )
+
+        action, ref, tag = HealthCheckWorkflowConfigFile.I.codeql_analyze_action()
+        assert f'"uses": "{action}@{ref}"  # {tag}' in read_text_utf8(
+            HealthCheckWorkflowConfigFile.I.path(),
+        )
+
+    def test_codeql_init_action(self) -> None:
+        """Test method."""
+        assert HealthCheckWorkflowConfigFile.I.codeql_init_action() == tuple(
+            resource_content("CODEQL_INIT_ACTION", resources).splitlines(),
+        )
+
+        action, ref, tag = HealthCheckWorkflowConfigFile.I.codeql_init_action()
+        assert f'"uses": "{action}@{ref}"  # {tag}' in read_text_utf8(
+            HealthCheckWorkflowConfigFile.I.path(),
+        )
+
+    def test_job_analyze(self) -> None:
+        """Test method."""
+        result = HealthCheckWorkflowConfigFile.I.job_analyze()
+        assert len(result) == 1, "Expected job to have one key"
+        job_name = next(iter(result.keys()))
+        job = result[job_name]
+        assert "steps" in job, "Expected 'steps' in job"
+        assert job["strategy"]["matrix"]["language"] == ["python", "actions"]
+        assert job["permissions"]["contents"] == "read"
+        assert job["permissions"]["actions"] == "read"
+        assert job["permissions"]["security-events"] == "write"
 
     def test_job_health_check(self) -> None:
         """Test method."""
@@ -33,61 +62,10 @@ class TestHealthCheckWorkflowConfigFile:
             HealthCheckWorkflowConfigFile.I.job_matrix_health_checks,
         )
 
-    def test_job_analyze(self) -> None:
+    def test_jobs(self) -> None:
         """Test method."""
-        result = HealthCheckWorkflowConfigFile.I.job_analyze()
-        assert len(result) == 1, "Expected job to have one key"
-        job_name = next(iter(result.keys()))
-        job = result[job_name]
-        assert "steps" in job, "Expected 'steps' in job"
-        assert job["strategy"]["matrix"]["language"] == ["python", "actions"]
-        assert job["permissions"]["contents"] == "read"
-        assert job["permissions"]["actions"] == "read"
-        assert job["permissions"]["security-events"] == "write"
-
-    def test_steps_analyze(self) -> None:
-        """Test method."""
-        result = HealthCheckWorkflowConfigFile.I.steps_analyze()
-        step_ids = [step["id"] for step in result]
-        assert step_ids == [
-            "checkout-repository",
-            "initialize-codeql",
-            "analyze-code",
-            "check-alerts",
-        ]
-        assert (
-            HealthCheckWorkflowConfigFile.I.load()["jobs"]["analyze"]["steps"] == result
-        )
-
-    def test_codeql_init_action(self) -> None:
-        """Test method."""
-        assert HealthCheckWorkflowConfigFile.I.codeql_init_action() == tuple(
-            resource_content("CODEQL_INIT_ACTION", resources).splitlines(),
-        )
-
-        action, ref, tag = HealthCheckWorkflowConfigFile.I.codeql_init_action()
-        assert f'"uses": "{action}@{ref}"  # {tag}' in read_text_utf8(
-            HealthCheckWorkflowConfigFile.I.path(),
-        )
-
-    def test_codeql_analyze_action(self) -> None:
-        """Test method."""
-        assert HealthCheckWorkflowConfigFile.I.codeql_analyze_action() == tuple(
-            resource_content("CODEQL_ANALYZE_ACTION", resources).splitlines(),
-        )
-
-        action, ref, tag = HealthCheckWorkflowConfigFile.I.codeql_analyze_action()
-        assert f'"uses": "{action}@{ref}"  # {tag}' in read_text_utf8(
-            HealthCheckWorkflowConfigFile.I.path(),
-        )
-
-    def test_step_initialize_codeql(self) -> None:
-        """Test method."""
-        step = HealthCheckWorkflowConfigFile.I.step_initialize_codeql()
-        assert step["with"] == {
-            "languages": "${{ matrix.language }}",
-            "config-file": ".github/codeql.yml",
-        }
+        result = HealthCheckWorkflowConfigFile.I.jobs()
+        assert "analyze" in result, "Expected 'analyze' job"
 
     def test_step_analyze_code(self) -> None:
         """Test method."""
@@ -109,3 +87,25 @@ class TestHealthCheckWorkflowConfigFile:
             '--jq=if . != [] then error("Alerts found") end',
         ]
         assert step["env"] == {"GH_TOKEN": "${{ secrets.GITHUB_TOKEN }}"}
+
+    def test_step_initialize_codeql(self) -> None:
+        """Test method."""
+        step = HealthCheckWorkflowConfigFile.I.step_initialize_codeql()
+        assert step["with"] == {
+            "languages": "${{ matrix.language }}",
+            "config-file": ".github/codeql.yml",
+        }
+
+    def test_steps_analyze(self) -> None:
+        """Test method."""
+        result = HealthCheckWorkflowConfigFile.I.steps_analyze()
+        step_ids = [step["id"] for step in result]
+        assert step_ids == [
+            "checkout-repository",
+            "initialize-codeql",
+            "analyze-code",
+            "check-alerts",
+        ]
+        assert (
+            HealthCheckWorkflowConfigFile.I.load()["jobs"]["analyze"]["steps"] == result
+        )

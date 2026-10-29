@@ -1,7 +1,7 @@
 """Health check workflow extended with CodeQL analysis and an open-alert gate."""
 
 from types import MethodType
-from typing import Any
+from typing import Any, override
 
 from pyrig.rig.configs.version_control.remote.workflows.health_check import (
     HealthCheckWorkflowConfigFile as BaseHealthCheckWorkflowConfigFile,
@@ -17,17 +17,7 @@ from pyrig_codeql.rig.configs.version_control.remote.code_analyzer import (
 class HealthCheckWorkflowConfigFile(BaseHealthCheckWorkflowConfigFile):
     """Add CodeQL analysis and an open-alert gate to the health check workflow."""
 
-    def jobs(self) -> dict[str, Any]:
-        """Return the base class's jobs, extended with the CodeQL analysis job.
-
-        Returns:
-            The base class jobs plus the CodeQL analysis job.
-        """
-        return {
-            **self.job_analyze(),
-            **super().jobs(),
-        }
-
+    @override
     def job_health_check_needs(self) -> tuple[MethodType, ...]:
         """Return the upstream jobs required before the aggregate job runs.
 
@@ -38,6 +28,18 @@ class HealthCheckWorkflowConfigFile(BaseHealthCheckWorkflowConfigFile):
             The base class's dependencies plus the CodeQL analysis job.
         """
         return (self.job_analyze, *super().job_health_check_needs())
+
+    @override
+    def jobs(self) -> dict[str, Any]:
+        """Return the base class's jobs, extended with the CodeQL analysis job.
+
+        Returns:
+            The base class jobs plus the CodeQL analysis job.
+        """
+        return {
+            **self.job_analyze(),
+            **super().jobs(),
+        }
 
     def job_analyze(self) -> dict[str, Any]:
         """Return the CodeQL analysis job.
@@ -74,24 +76,6 @@ class HealthCheckWorkflowConfigFile(BaseHealthCheckWorkflowConfigFile):
             self.step_check_alerts(),
         ]
 
-    def step_initialize_codeql(self) -> dict[str, Any]:
-        """Build a step that initializes the CodeQL database.
-
-        Neither analyzed language is compiled, so no build step is
-        required between initialization and analysis.
-
-        Returns:
-            Step using `github/codeql-action/init@<ref>`.
-        """
-        return self.step(
-            self.step_initialize_codeql,
-            uses=self.codeql_init_action(),
-            with_={
-                "languages": self.insert_expression("matrix.language"),
-                "config-file": CodeAnalyzerConfigFile.I.path().as_posix(),
-            },
-        )
-
     def step_analyze_code(self) -> dict[str, Any]:
         """Build a step that runs the CodeQL analysis and uploads results.
 
@@ -122,13 +106,23 @@ class HealthCheckWorkflowConfigFile(BaseHealthCheckWorkflowConfigFile):
             env={"GH_TOKEN": self.insert_expression("secrets.GITHUB_TOKEN")},
         )
 
-    def codeql_init_action(self) -> tuple[str, str, str]:
-        """Return action metadata for `github/codeql-action/init`.
+    def step_initialize_codeql(self) -> dict[str, Any]:
+        """Build a step that initializes the CodeQL database.
+
+        Neither analyzed language is compiled, so no build step is
+        required between initialization and analysis.
 
         Returns:
-            Tuple of action name, pinned commit SHA, and release tag.
+            Step using `github/codeql-action/init@<ref>`.
         """
-        return self.action_from_resource(self.codeql_init_action, resources)
+        return self.step(
+            self.step_initialize_codeql,
+            uses=self.codeql_init_action(),
+            with_={
+                "languages": self.insert_expression("matrix.language"),
+                "config-file": CodeAnalyzerConfigFile.I.path().as_posix(),
+            },
+        )
 
     def codeql_analyze_action(self) -> tuple[str, str, str]:
         """Return action metadata for `github/codeql-action/analyze`.
@@ -137,3 +131,11 @@ class HealthCheckWorkflowConfigFile(BaseHealthCheckWorkflowConfigFile):
             Tuple of action name, pinned commit SHA, and release tag.
         """
         return self.action_from_resource(self.codeql_analyze_action, resources)
+
+    def codeql_init_action(self) -> tuple[str, str, str]:
+        """Return action metadata for `github/codeql-action/init`.
+
+        Returns:
+            Tuple of action name, pinned commit SHA, and release tag.
+        """
+        return self.action_from_resource(self.codeql_init_action, resources)
