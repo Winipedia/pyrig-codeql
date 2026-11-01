@@ -60,6 +60,7 @@ class HealthCheckWorkflowConfigFile(BaseHealthCheckWorkflowConfigFile):
                 **self.permission("security-events", write=True),
             },
             steps=self.steps_analyze(),
+            timeout_minutes=90,
         )
 
     def steps_analyze(self) -> list[dict[str, Any]]:
