@@ -38,21 +38,26 @@ class TestHealthCheckWorkflowConfigFile:
 
     def test_job_analyze(self) -> None:
         """Test method."""
-        result = HealthCheckWorkflowConfigFile.I.job_analyze()
-        assert len(result) == 1, "Expected job to have one key"
-        job_name = next(iter(result.keys()))
-        job = result[job_name]
+        job = HealthCheckWorkflowConfigFile.I.job_analyze()
+        assert job["job_id"] == "analyze"
         assert "steps" in job, "Expected 'steps' in job"
         assert job["strategy"]["matrix"]["language"] == ["python", "actions"]
         assert job["permissions"]["contents"] == "read"
         assert job["permissions"]["actions"] == "read"
         assert job["permissions"]["security-events"] == "write"
 
+    def test_job_analyze_permissions(self) -> None:
+        """Test method."""
+        assert HealthCheckWorkflowConfigFile.I.job_analyze_permissions() == {
+            "contents": "read",
+            "actions": "read",
+            "security-events": "write",
+        }
+
     def test_job_health_check(self) -> None:
         """Test method."""
         result = HealthCheckWorkflowConfigFile.I.job_health_check()
-        job_name = next(iter(result.keys()))
-        assert "analyze" in result[job_name]["needs"], "Expected 'analyze' in needs"
+        assert "analyze" in result["needs"], "Expected 'analyze' in needs"
 
     def test_job_health_check_needs(self) -> None:
         """Test method."""
@@ -64,8 +69,8 @@ class TestHealthCheckWorkflowConfigFile:
 
     def test_jobs(self) -> None:
         """Test method."""
-        result = HealthCheckWorkflowConfigFile.I.jobs()
-        assert "analyze" in result, "Expected 'analyze' job"
+        workflow = HealthCheckWorkflowConfigFile.I
+        assert workflow.job_analyze in workflow.jobs(), "Expected 'analyze' job"
 
     def test_step_analyze_code(self) -> None:
         """Test method."""

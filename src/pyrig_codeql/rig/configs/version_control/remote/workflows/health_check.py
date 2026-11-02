@@ -1,5 +1,6 @@
 """Health check workflow extended with CodeQL analysis and an open-alert gate."""
 
+from collections.abc import Callable
 from types import MethodType
 from typing import Any, override
 
@@ -30,38 +31,48 @@ class HealthCheckWorkflowConfigFile(BaseHealthCheckWorkflowConfigFile):
         return (self.job_analyze, *super().job_health_check_needs())
 
     @override
-    def jobs(self) -> dict[str, Any]:
-        """Return the base class's jobs, extended with the CodeQL analysis job.
+    def jobs(self) -> tuple[Callable[[], dict[str, Any]], ...]:
+        """Return the base job builders, extended with the CodeQL analysis builder.
 
         Returns:
-            The base class jobs plus the CodeQL analysis job.
+            Tuple of the CodeQL analysis builder followed by the base job builders.
         """
-        return {
-            **self.job_analyze(),
-            **super().jobs(),
-        }
+        return (
+            self.job_analyze,
+            *super().jobs(),
+        )
 
     def job_analyze(self) -> dict[str, Any]:
         """Return the CodeQL analysis job.
 
         Returns:
             Job configuration with a matrix over `("python", "actions")`,
-            the permissions needed to analyze code, upload results, and read
-            alerts, and steps that fail the job on open CodeQL alerts.
+            the job's permissions, and steps that fail the job on open
+            CodeQL alerts.
         """
         return self.job(
             self.job_analyze,
             strategy=self.strategy_matrix(
                 matrix=self.matrix({"language": ["python", "actions"]}),
             ),
-            permissions={
-                **self.permission_contents(),
-                **self.permission("actions"),
-                **self.permission("security-events", write=True),
-            },
+            permissions=self.job_analyze_permissions(),
             steps=self.steps_analyze(),
             timeout_minutes=90,
         )
+
+    def job_analyze_permissions(self) -> dict[str, Any]:
+        """Return the permissions for the CodeQL analysis job.
+
+        Returns:
+            Permissions needed to analyze code (`contents: read`), read
+            workflow runs (`actions: read`), and upload results and read
+            alerts (`security-events: write`).
+        """
+        return {
+            **self.permission_contents(),
+            **self.permission("actions"),
+            **self.permission("security-events", write=True),
+        }
 
     def steps_analyze(self) -> list[dict[str, Any]]:
         """Return the steps for the CodeQL analysis job.
