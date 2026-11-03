@@ -14,24 +14,24 @@ from pyrig_codeql.rig.configs.version_control.remote.workflows.health_check impo
 class TestHealthCheckWorkflowConfigFile:
     """Test class."""
 
-    def test_codeql_analyze_action(self) -> None:
+    def test_action_codeql_analyze(self) -> None:
         """Test method."""
-        assert HealthCheckWorkflowConfigFile.I.codeql_analyze_action() == tuple(
-            resource_content("CODEQL_ANALYZE_ACTION", resources).splitlines(),
+        assert HealthCheckWorkflowConfigFile.I.action_codeql_analyze() == tuple(
+            resource_content("ACTION_CODEQL_ANALYZE", resources).splitlines(),
         )
 
-        action, ref, tag = HealthCheckWorkflowConfigFile.I.codeql_analyze_action()
+        action, ref, tag = HealthCheckWorkflowConfigFile.I.action_codeql_analyze()
         assert f'"uses": "{action}@{ref}"  # {tag}' in read_text_utf8(
             HealthCheckWorkflowConfigFile.I.path(),
         )
 
-    def test_codeql_init_action(self) -> None:
+    def test_action_codeql_init(self) -> None:
         """Test method."""
-        assert HealthCheckWorkflowConfigFile.I.codeql_init_action() == tuple(
-            resource_content("CODEQL_INIT_ACTION", resources).splitlines(),
+        assert HealthCheckWorkflowConfigFile.I.action_codeql_init() == tuple(
+            resource_content("ACTION_CODEQL_INIT", resources).splitlines(),
         )
 
-        action, ref, tag = HealthCheckWorkflowConfigFile.I.codeql_init_action()
+        action, ref, tag = HealthCheckWorkflowConfigFile.I.action_codeql_init()
         assert f'"uses": "{action}@{ref}"  # {tag}' in read_text_utf8(
             HealthCheckWorkflowConfigFile.I.path(),
         )

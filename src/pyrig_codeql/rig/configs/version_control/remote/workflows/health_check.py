@@ -96,7 +96,7 @@ class HealthCheckWorkflowConfigFile(BaseHealthCheckWorkflowConfigFile):
         """
         return self.step(
             self.step_analyze_code,
-            uses=self.codeql_analyze_action(),
+            uses=self.action_codeql_analyze(),
         )
 
     def step_check_alerts(self) -> dict[str, Any]:
@@ -129,25 +129,25 @@ class HealthCheckWorkflowConfigFile(BaseHealthCheckWorkflowConfigFile):
         """
         return self.step(
             self.step_initialize_codeql,
-            uses=self.codeql_init_action(),
+            uses=self.action_codeql_init(),
             with_={
                 "languages": self.insert_expression("matrix.language"),
                 "config-file": CodeAnalyzerConfigFile.I.path().as_posix(),
             },
         )
 
-    def codeql_analyze_action(self) -> tuple[str, str, str]:
+    def action_codeql_analyze(self) -> tuple[str, str, str]:
         """Return action metadata for `github/codeql-action/analyze`.
 
         Returns:
             Tuple of action name, pinned commit SHA, and release tag.
         """
-        return self.action_from_resource(self.codeql_analyze_action, resources)
+        return self.action_from_resource(self.action_codeql_analyze, resources)
 
-    def codeql_init_action(self) -> tuple[str, str, str]:
+    def action_codeql_init(self) -> tuple[str, str, str]:
         """Return action metadata for `github/codeql-action/init`.
 
         Returns:
             Tuple of action name, pinned commit SHA, and release tag.
         """
-        return self.action_from_resource(self.codeql_init_action, resources)
+        return self.action_from_resource(self.action_codeql_init, resources)
