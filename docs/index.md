@@ -61,10 +61,11 @@ uv add pyrig-codeql --dev
 uv run pyrig sync
 ```
 
-## Analysis job
+## Reusable CodeQL workflow
 
-The plugin adds an `analyze` job to the generated health-check workflow. Its
-matrix analyzes two languages:
+The plugin adds a reusable `.github/workflows/codeql.yml` workflow and calls it
+from the generated health-check workflow. Its `analyze` matrix job analyzes
+two languages:
 
 | Language | Scope |
 | --- | --- |
@@ -80,15 +81,16 @@ configuration with:
 - `paths-ignore` for the project's test package (`tests/**` in this repository),
   so test-only code is excluded from analysis.
 
-The analysis step uploads the results to GitHub code scanning. The pinned
-action waits for processing by default; findings do not fail that step itself.
-A following API check fails the job if the analyzed ref has **any open CodeQL
-security or quality alerts**, at any severity, whether new or pre-existing.
-Fixed and dismissed alerts are excluded.
+The analysis job uploads results to GitHub code scanning. The pinned action
+waits for processing by default; findings do not fail that job itself. A
+separate `check-alerts` job runs after both matrix entries complete and fails
+if the analyzed ref has **any open CodeQL security or quality alerts**, at any
+severity, whether new or pre-existing. Fixed and dismissed alerts are excluded.
 
-The `analyze` job is added to the aggregate `health-check` job's `needs` list.
-As a result, the aggregate health check waits for CodeQL as well as the normal
-project checks and remains the workflow's release gate.
+The plugin extends pyrig's `jobs_health_check()` hook; pyrig automatically adds
+the reusable `codeql` job to the aggregate `health-check` job's `needs` list.
+The aggregate health check therefore waits for CodeQL and the normal project
+checks, remaining the workflow's release gate.
 
 ## API Reference
 
