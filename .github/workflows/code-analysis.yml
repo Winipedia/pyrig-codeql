@@ -1,12 +1,12 @@
 ---
-"name": "Codeql"
+"name": "Code Analysis"
 "on":
   "workflow_call": {}
 "permissions": {}
 "concurrency":
-  "group": "Codeql-${{ github.ref }}"
+  "group": "Code Analysis-${{ github.ref }}"
   "cancel-in-progress": true
-"run-name": "Codeql"
+"run-name": "Code Analysis"
 "jobs":
   "analyze":
     "name": "Analyze"

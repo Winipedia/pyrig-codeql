@@ -1,4 +1,4 @@
-"""CodeQL configuration that restricts analysis to shipped source code."""
+"""CodeQL-specific configuration for source code analysis."""
 
 from pathlib import Path
 from typing import Any, override
@@ -9,11 +9,14 @@ from pyrig.rig.tools.version_control.remote.controller import (
     RemoteVersionController,
 )
 
+from pyrig_codeql.rig.tools.security.code import CodeAnalyzer
+
 
 class CodeAnalyzerConfigFile(YMLDictConfigFile):
     """Configuration consumed by the CodeQL `init` action's `config-file` input.
 
-    Manages `.github/codeql.yml`, including the query suite and ignored paths.
+    Manages the CodeQL-specific `.github/codeql.yml` file, including the query
+    suite and ignored paths.
     """
 
     @override
@@ -24,7 +27,7 @@ class CodeAnalyzerConfigFile(YMLDictConfigFile):
     @override
     def stem(self) -> str:
         """Return `'codeql'`."""
-        return "codeql"
+        return CodeAnalyzer.I.name()
 
     @override
     def _configs(self) -> dict[str, Any]:

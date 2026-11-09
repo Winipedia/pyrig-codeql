@@ -4,11 +4,13 @@
 [![CI](https://img.shields.io/github/actions/workflow/status/Winipedia/pyrig-codeql/health-check.yml?label=CI&logo=github)](https://github.com/Winipedia/pyrig-codeql/actions/workflows/health-check.yml)
 [![CD](https://img.shields.io/github/actions/workflow/status/Winipedia/pyrig-codeql/release.yml?label=CD&logo=github)](https://github.com/Winipedia/pyrig-codeql/actions/workflows/release.yml)
 [![ProjectTester](https://codecov.io/gh/Winipedia/pyrig-codeql/branch/main/graph/badge.svg)](https://codecov.io/gh/Winipedia/pyrig-codeql)
+[![SecurityPracticesChecker](https://api.scorecard.dev/projects/github.com/Winipedia/pyrig-codeql/badge)](https://scorecard.dev/viewer/?uri=github.com/Winipedia/pyrig-codeql)
 <!-- code-quality -->
 [![ByteOrderMarkerFormatter](https://img.shields.io/badge/BOM-fix--byte--order--marker-orange)](https://prek.j178.dev/reference/built-in-hooks/#fix-byte-order-marker)
 [![CICDLinter](https://img.shields.io/badge/CI/CD-actionlint-blue)](https://github.com/rhysd/actionlint)
 [![CICDSecurityChecker](https://img.shields.io/badge/%F0%9F%8C%88-zizmor-white?labelColor=white)](https://github.com/zizmorcore/zizmor)
 [![CaseConflictChecker](https://img.shields.io/badge/case--conflict-check--case--conflict-blue)](https://prek.j178.dev/reference/built-in-hooks/#check-case-conflict)
+[![CodeAnalyzer](https://img.shields.io/badge/code%20analysis-CodeQL-181717?logo=github)](https://codeql.github.com/docs/)
 [![DeadCodeChecker](https://img.shields.io/badge/dead--code-vulture-blue)](https://github.com/jendrikseipp/vulture)
 [![DependencyChecker](https://img.shields.io/badge/dependencies-deptry-blue)](https://github.com/osprey-oss/deptry)
 [![EndOfFileFormatter](https://img.shields.io/badge/EOF-end--of--file--fixer-orange)](https://prek.j178.dev/reference/built-in-hooks/#end-of-file-fixer)
@@ -61,11 +63,11 @@ uv add pyrig-codeql --dev
 uv run pyrig sync
 ```
 
-## Reusable CodeQL workflow
+## Reusable Code Analysis workflow
 
-The plugin adds a reusable `.github/workflows/codeql.yml` workflow and calls it
-from the generated health-check workflow. Its `analyze` matrix job analyzes
-two languages:
+The plugin adds a reusable `.github/workflows/code-analysis.yml` workflow and
+calls it from the generated health-check workflow as the `code-analysis` job.
+Its `analyze` matrix job uses CodeQL to analyze two languages:
 
 | Language | Scope |
 | --- | --- |
@@ -73,8 +75,8 @@ two languages:
 | `actions` | GitHub Actions workflow files |
 
 Each matrix job checks out the repository, initializes CodeQL, and performs the
-analysis. The initialization step uses the repository's `.github/codeql.yml`
-configuration with:
+analysis. The initialization step uses the CodeQL-specific
+`.github/codeql.yml` configuration with:
 
 - the `security-and-quality` query suite, which includes security and
   code-quality queries;
@@ -88,9 +90,9 @@ if the analyzed ref has **any open CodeQL security or quality alerts**, at any
 severity, whether new or pre-existing. Fixed and dismissed alerts are excluded.
 
 The plugin extends pyrig's `jobs_health_check()` hook; pyrig automatically adds
-the reusable `codeql` job to the aggregate `health-check` job's `needs` list.
-The aggregate health check therefore waits for CodeQL and the normal project
-checks, remaining the workflow's release gate.
+the reusable `code-analysis` job to the aggregate `health-check` job's `needs`
+list. The aggregate health check therefore waits for CodeQL and the normal
+project checks, remaining the workflow's release gate.
 
 ## API Reference
 

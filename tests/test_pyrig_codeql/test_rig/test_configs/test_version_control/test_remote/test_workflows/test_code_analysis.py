@@ -6,17 +6,17 @@ from pyrig.core.resources import resource_content
 from pyrig.core.strings import read_text_utf8
 
 from pyrig_codeql.rig import resources
-from pyrig_codeql.rig.configs.version_control.remote.workflows.codeql import (
-    CodeqlWorkflowConfigFile,
+from pyrig_codeql.rig.configs.version_control.remote.workflows.code_analysis import (
+    CodeAnalysisWorkflowConfigFile,
 )
 
 
-class TestCodeqlWorkflowConfigFile:
+class TestCodeAnalysisWorkflowConfigFile:
     """Test class."""
 
     def test_action_codeql_analyze(self) -> None:
         """Test method."""
-        workflow = CodeqlWorkflowConfigFile.I
+        workflow = CodeAnalysisWorkflowConfigFile.I
         assert workflow.action_codeql_analyze() == tuple(
             resource_content("ACTION_CODEQL_ANALYZE", resources).splitlines(),
         )
@@ -25,7 +25,7 @@ class TestCodeqlWorkflowConfigFile:
 
     def test_action_codeql_init(self) -> None:
         """Test method."""
-        workflow = CodeqlWorkflowConfigFile.I
+        workflow = CodeAnalysisWorkflowConfigFile.I
         assert workflow.action_codeql_init() == tuple(
             resource_content("ACTION_CODEQL_INIT", resources).splitlines(),
         )
@@ -34,7 +34,7 @@ class TestCodeqlWorkflowConfigFile:
 
     def test_job_analyze(self) -> None:
         """Test method."""
-        workflow = CodeqlWorkflowConfigFile.I
+        workflow = CodeAnalysisWorkflowConfigFile.I
         job = workflow.job_analyze()
         assert job["job_id"] == "analyze"
         assert job["runs-on"] == "ubuntu-latest"
@@ -49,7 +49,7 @@ class TestCodeqlWorkflowConfigFile:
 
     def test_job_analyze_permissions(self) -> None:
         """Test method."""
-        assert CodeqlWorkflowConfigFile.I.job_analyze_permissions() == {
+        assert CodeAnalysisWorkflowConfigFile.I.job_analyze_permissions() == {
             "actions": "read",
             "contents": "read",
             "security-events": "write",
@@ -57,7 +57,7 @@ class TestCodeqlWorkflowConfigFile:
 
     def test_job_check_alerts(self) -> None:
         """Test method."""
-        workflow = CodeqlWorkflowConfigFile.I
+        workflow = CodeAnalysisWorkflowConfigFile.I
         job = workflow.job_check_alerts()
         assert job["job_id"] == "check-alerts"
         assert job["timeout-minutes"] == 5  # noqa: PLR2004
@@ -67,24 +67,28 @@ class TestCodeqlWorkflowConfigFile:
 
     def test_job_check_alerts_permissions(self) -> None:
         """Test method."""
-        assert CodeqlWorkflowConfigFile.I.job_check_alerts_permissions() == {
+        assert CodeAnalysisWorkflowConfigFile.I.job_check_alerts_permissions() == {
             "security-events": "read",
         }
 
     def test_jobs(self) -> None:
         """Test method."""
-        workflow = CodeqlWorkflowConfigFile.I
+        workflow = CodeAnalysisWorkflowConfigFile.I
         assert workflow.jobs() == (workflow.job_analyze, workflow.job_check_alerts)
+
+    def test_stem(self) -> None:
+        """Test method."""
+        assert CodeAnalysisWorkflowConfigFile.I.stem() == "code-analysis"
 
     def test_step_analyze_code(self) -> None:
         """Test method."""
-        step = CodeqlWorkflowConfigFile.I.step_analyze_code()
+        step = CodeAnalysisWorkflowConfigFile.I.step_analyze_code()
         assert "uses" in step
         assert "with" not in step
 
     def test_step_check_alerts(self) -> None:
         """Test method."""
-        step = CodeqlWorkflowConfigFile.I.step_check_alerts()
+        step = CodeAnalysisWorkflowConfigFile.I.step_check_alerts()
         assert shlex.split(step["run"].replace("\\\n", "")) == [
             "gh",
             "api",
@@ -99,14 +103,14 @@ class TestCodeqlWorkflowConfigFile:
 
     def test_step_initialize_codeql(self) -> None:
         """Test method."""
-        assert CodeqlWorkflowConfigFile.I.step_initialize_codeql()["with"] == {
+        assert CodeAnalysisWorkflowConfigFile.I.step_initialize_codeql()["with"] == {
             "languages": "${{ matrix.language }}",
             "config-file": ".github/codeql.yml",
         }
 
     def test_steps_analyze(self) -> None:
         """Test method."""
-        workflow = CodeqlWorkflowConfigFile.I
+        workflow = CodeAnalysisWorkflowConfigFile.I
         assert [step["id"] for step in workflow.steps_analyze()] == [
             "checkout-repository",
             "initialize-codeql",
@@ -115,11 +119,11 @@ class TestCodeqlWorkflowConfigFile:
 
     def test_steps_check_alerts(self) -> None:
         """Test method."""
-        workflow = CodeqlWorkflowConfigFile.I
+        workflow = CodeAnalysisWorkflowConfigFile.I
         assert workflow.steps_check_alerts() == [workflow.step_check_alerts()]
 
     def test_workflow_triggers(self) -> None:
         """Test method."""
-        assert CodeqlWorkflowConfigFile.I.workflow_triggers() == {
+        assert CodeAnalysisWorkflowConfigFile.I.workflow_triggers() == {
             "workflow_call": {},
         }

@@ -1,12 +1,12 @@
 ---
-"name": "Scorecard"
+"name": "Security Practices"
 "on":
   "workflow_call": {}
 "permissions": {}
 "concurrency":
-  "group": "Scorecard-${{ github.ref }}"
+  "group": "Security Practices-${{ github.ref }}"
   "cancel-in-progress": true
-"run-name": "Scorecard"
+"run-name": "Security Practices"
 "jobs":
   "analyze":
     "name": "Analyze"

@@ -1,4 +1,4 @@
-"""Reusable CodeQL analysis and code-scanning alert gate."""
+"""Reusable code analysis and code-scanning alert gate."""
 
 from collections.abc import Callable
 from typing import Any, override
@@ -12,13 +12,18 @@ from pyrig_codeql.rig.configs.version_control.remote.code_analyzer import (
 )
 
 
-class CodeqlWorkflowConfigFile(WorkflowConfigFile):
+class CodeAnalysisWorkflowConfigFile(WorkflowConfigFile):
     """Analyze Python and GitHub Actions code and fail on open CodeQL alerts."""
 
     @override
     def jobs(self) -> tuple[Callable[[], dict[str, Any]], ...]:
         """Return the analysis and alert-gate jobs."""
         return (self.job_analyze, self.job_check_alerts)
+
+    @override
+    def stem(self) -> str:
+        """Return the workflow filename stem."""
+        return "code-analysis"
 
     @override
     def workflow_triggers(self) -> dict[str, Any]:
