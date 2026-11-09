@@ -19,7 +19,7 @@ class TestCodeAnalyzer:
     def test_image_url(self) -> None:
         """Test method."""
         assert CodeAnalyzer.I.image_url() == (
-            "https://img.shields.io/badge/code%20analysis-CodeQL-181717?logo=github"
+            "https://img.shields.io/badge/code--analysis-CodeQL-181717?logo=github"
         )
 
     def test_link_url(self) -> None:

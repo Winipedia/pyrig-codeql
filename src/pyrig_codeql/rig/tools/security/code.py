@@ -21,7 +21,7 @@ class CodeAnalyzer(Tool):
     @override
     def image_url(self) -> str:
         """Return a badge identifying CodeQL as the project's code analyzer."""
-        return "https://img.shields.io/badge/code%20analysis-CodeQL-181717?logo=github"
+        return "https://img.shields.io/badge/code--analysis-CodeQL-181717?logo=github"
 
     @override
     def link_url(self) -> str:
