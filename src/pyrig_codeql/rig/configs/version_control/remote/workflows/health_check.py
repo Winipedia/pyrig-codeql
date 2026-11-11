@@ -25,13 +25,7 @@ class HealthCheckWorkflowConfigFile(BaseHealthCheckWorkflowConfigFile):
 
     def job_code_analysis(self) -> dict[str, Any]:
         """Call the reusable code-analysis workflow."""
-        return self.job(
+        return self.job_workflow_call(
             self.job_code_analysis,
-            uses=CodeAnalysisWorkflowConfigFile.I.workflow_call_reference(),
-            permissions=self.job_code_analysis_permissions() or None,
-            secrets=CodeAnalysisWorkflowConfigFile.I.used_secrets_mapping() or None,
+            workflow=CodeAnalysisWorkflowConfigFile,
         )
-
-    def job_code_analysis_permissions(self) -> dict[str, str]:
-        """Return permissions required by the reusable code-analysis workflow."""
-        return CodeAnalysisWorkflowConfigFile.I.used_permissions()

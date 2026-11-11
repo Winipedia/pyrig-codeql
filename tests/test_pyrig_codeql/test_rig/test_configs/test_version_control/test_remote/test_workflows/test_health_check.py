@@ -17,15 +17,10 @@ class TestHealthCheckWorkflowConfigFile:
         assert job["job_id"] == "code-analysis"
         assert job["name"] == "Code Analysis"
         assert job["uses"] == "$/.github/workflows/code-analysis.yml"
-        assert (
-            job["permissions"]
-            == HealthCheckWorkflowConfigFile.I.job_code_analysis_permissions()
+        assert job["permissions"] == CodeAnalysisWorkflowConfigFile.I.used_permissions()
+        assert job.get("secrets") == (
+            CodeAnalysisWorkflowConfigFile.I.used_secrets_mapping() or None
         )
-
-    def test_job_code_analysis_permissions(self) -> None:
-        """Test method."""
-        permissions = HealthCheckWorkflowConfigFile.I.job_code_analysis_permissions()
-        assert permissions == CodeAnalysisWorkflowConfigFile.I.used_permissions()
 
     def test_jobs_health_check(self) -> None:
         """Test method."""
