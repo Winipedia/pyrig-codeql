@@ -925,7 +925,7 @@ wheels = [
 
 [[package]]
 name = "pyrig"
-version = "19.28.2"
+version = "19.29.0"
 source = { registry = "https://pypi.org/simple" }
 dependencies = [
     { name = "inquirerpy" },
@@ -936,9 +936,9 @@ dependencies = [
     { name = "tomli-w" },
     { name = "typer" },
 ]
-sdist = { url = "https://files.pythonhosted.org/packages/5f/27/a1a3ce4c2d8a94d71f75fc1ccfc9eda23ebee6f57bcfe8b7d71b8ecf62b6/pyrig-19.28.2.tar.gz", hash = "sha256:5f7cdb3adcf011f2ce73d484c5817ee43b04af893fb028167b443f91c1827c34", size = 114518, upload-time = "2026-11-11T02:16:48.591Z" }
+sdist = { url = "https://files.pythonhosted.org/packages/81/fc/62c790df16b83a23a744f7bec07cd3fc00ff916b91102b448d1c6f5f548c/pyrig-19.29.0.tar.gz", hash = "sha256:1ab477f9059c5ae6a87eb1c88ce87f51302201b9981fdd08a7c89b0fe2f9fa14", size = 114586, upload-time = "2026-11-11T13:19:43.287Z" }
 wheels = [
-    { url = "https://files.pythonhosted.org/packages/2a/73/fe2eb7f42ad7d163b6113c9d5a4d0bf539d6a434b88a668d59455955f28f/pyrig-19.28.2-py3-none-any.whl", hash = "sha256:741feab321496ed31eaae1f56e51786330402f7275110b2756fd4f76ef2f9848", size = 173459, upload-time = "2026-11-11T02:16:46.579Z" },
+    { url = "https://files.pythonhosted.org/packages/c7/12/8ad48f1d11752d4218b627af1f340840a69b0252b8008eeae3ced6a34d17/pyrig-19.29.0-py3-none-any.whl", hash = "sha256:231bf1c434597a844e483a16f64b506e8862dc688efe2ce7565a583f1027798c", size = 173516, upload-time = "2026-11-11T13:19:41.052Z" },
 ]
 
 [[package]]
@@ -955,7 +955,7 @@ wheels = [
 
 [[package]]
 name = "pyrig-codeql"
-version = "3.1.11"
+version = "3.1.12"
 source = { editable = "." }
 dependencies = [
     { name = "pyrig" },
@@ -992,7 +992,7 @@ dev = [
 ]
 
 [package.metadata]
-requires-dist = [{ name = "pyrig", specifier = ">=19.22.0" }]
+requires-dist = [{ name = "pyrig", specifier = ">=19.29.0" }]
 
 [package.metadata.requires-dev]
 dev = [
