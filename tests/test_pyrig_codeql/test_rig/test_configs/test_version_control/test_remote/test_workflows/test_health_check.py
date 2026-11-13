@@ -17,7 +17,7 @@ class TestHealthCheckWorkflowConfigFile:
         assert job["job_id"] == "code-analysis"
         assert job["name"] == "Code Analysis"
         assert job["uses"] == "$/.github/workflows/code-analysis.yml"
-        assert job["permissions"] == CodeAnalysisWorkflowConfigFile.I.used_permissions()
+        assert job["permissions"] == CodeAnalysisWorkflowConfigFile.I.permissions_used()
         assert job.get("secrets") == (
             CodeAnalysisWorkflowConfigFile.I.used_secrets_mapping() or None
         )
