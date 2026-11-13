@@ -40,20 +40,12 @@ class TestCodeAnalysisWorkflowConfigFile:
         assert job["runs-on"] == "ubuntu-latest"
         assert job["timeout-minutes"] == 90  # noqa: PLR2004
         assert job["strategy"]["matrix"]["language"] == ["python", "actions"]
-        assert job["permissions"] == workflow.job_analyze_permissions()
+        assert job["permissions"] == workflow.permissions_job_analyze()
         assert [step["id"] for step in job["steps"]] == [
             "checkout-repository",
             "initialize-codeql",
             "analyze-code",
         ]
-
-    def test_job_analyze_permissions(self) -> None:
-        """Test method."""
-        assert CodeAnalysisWorkflowConfigFile.I.job_analyze_permissions() == {
-            "actions": "read",
-            "contents": "read",
-            "security-events": "write",
-        }
 
     def test_job_check_alerts(self) -> None:
         """Test method."""
@@ -62,19 +54,27 @@ class TestCodeAnalysisWorkflowConfigFile:
         assert job["job_id"] == "check-alerts"
         assert job["timeout-minutes"] == 5  # noqa: PLR2004
         assert job["needs"] == ["analyze"]
-        assert job["permissions"] == workflow.job_check_alerts_permissions()
+        assert job["permissions"] == workflow.permissions_job_check_alerts()
         assert job["steps"] == workflow.steps_check_alerts()
-
-    def test_job_check_alerts_permissions(self) -> None:
-        """Test method."""
-        assert CodeAnalysisWorkflowConfigFile.I.job_check_alerts_permissions() == {
-            "security-events": "read",
-        }
 
     def test_jobs(self) -> None:
         """Test method."""
         workflow = CodeAnalysisWorkflowConfigFile.I
         assert workflow.jobs() == (workflow.job_analyze, workflow.job_check_alerts)
+
+    def test_permissions_job_analyze(self) -> None:
+        """Test method."""
+        assert CodeAnalysisWorkflowConfigFile.I.permissions_job_analyze() == {
+            "actions": "read",
+            "contents": "read",
+            "security-events": "write",
+        }
+
+    def test_permissions_job_check_alerts(self) -> None:
+        """Test method."""
+        assert CodeAnalysisWorkflowConfigFile.I.permissions_job_check_alerts() == {
+            "security-events": "read",
+        }
 
     def test_stem(self) -> None:
         """Test method."""
