@@ -19,7 +19,7 @@ class TestHealthCheckWorkflowConfigFile:
         assert job["uses"] == "$/.github/workflows/code-analysis.yml"
         assert job["permissions"] == CodeAnalysisWorkflowConfigFile.I.permissions_used()
         assert job.get("secrets") == (
-            CodeAnalysisWorkflowConfigFile.I.used_secrets_mapping() or None
+            CodeAnalysisWorkflowConfigFile.I.secrets_used_mapping() or None
         )
 
     def test_jobs_health_check(self) -> None:
