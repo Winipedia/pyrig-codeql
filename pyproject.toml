@@ -1,6 +1,6 @@
 [project]
 name = "pyrig-codeql"
-version = "3.1.30"
+version = "3.1.31"
 description = "A pyrig plugin that integrates GitHub CodeQL."
 readme = "README.md"
 requires-python = ">=3.12"
@@ -131,6 +131,13 @@ strict = true
 ALL = "enable"
 key-ordering = "disable"
 yaml-directive = "disable"
+
+[tool.typos.default]
+extend-ignore-re = [
+  "(?m)^.*spellchecker:disable-line.*$",
+  "(?m)^.*spellchecker:disable-next-line.*\n.*",
+]
+locale = "en-us"
 
 [tool.vulture]
 paths = [
