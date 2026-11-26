@@ -1336,7 +1336,7 @@ wheels = [
 
 [[package]]
 name = "pyrig-codeql"
-version = "3.1.46"
+version = "3.1.47"
 source = { editable = "." }
 dependencies = [
     { name = "pyrig" },
