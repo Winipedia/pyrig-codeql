@@ -26,6 +26,5 @@ class HealthCheckWorkflowConfigFile(BaseHealthCheckWorkflowConfigFile):
     def job_code_analysis(self) -> dict[str, Any]:
         """Call the reusable code-analysis workflow."""
         return self.job_workflow_call(
-            self.job_code_analysis,
             workflow=CodeAnalysisWorkflowConfigFile,
         )

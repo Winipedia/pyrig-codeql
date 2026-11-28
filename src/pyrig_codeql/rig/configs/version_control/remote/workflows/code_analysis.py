@@ -33,7 +33,6 @@ class CodeAnalysisWorkflowConfigFile(WorkflowConfigFile):
     def job_check_alerts(self) -> dict[str, Any]:
         """Check CodeQL alerts after all language analyses have completed."""
         return self.job(
-            self.job_check_alerts,
             needs=(self.job_analyze,),
             permissions=self.permissions_job_check_alerts(),
             steps=self.steps_check_alerts(),
@@ -43,7 +42,6 @@ class CodeAnalysisWorkflowConfigFile(WorkflowConfigFile):
     def job_analyze(self) -> dict[str, Any]:
         """Build the matrix job that analyzes Python and workflow code."""
         return self.job(
-            self.job_analyze,
             strategy=self.strategy_matrix(
                 matrix=self.matrix({"language": ["python", "actions"]}),
             ),
@@ -56,9 +54,9 @@ class CodeAnalysisWorkflowConfigFile(WorkflowConfigFile):
         """Grant read access to code-scanning alerts."""
         return self.permission("security-events")
 
-    def steps_check_alerts(self) -> list[dict[str, Any]]:
+    def steps_check_alerts(self) -> tuple[Callable[[], dict[str, Any]], ...]:
         """Return the CodeQL alert-check step."""
-        return [self.step_check_alerts()]
+        return (self.step_check_alerts,)
 
     def permissions_job_analyze(self) -> dict[str, str]:
         """Grant the permissions required to analyze and upload CodeQL results."""
@@ -71,7 +69,6 @@ class CodeAnalysisWorkflowConfigFile(WorkflowConfigFile):
     def step_check_alerts(self) -> dict[str, Any]:
         """Fail if the analyzed ref has any open CodeQL alerts."""
         return self.step(
-            self.step_check_alerts,
             run=RemoteVersionController.I.api_method_args(
                 '--raw-field="ref=${GITHUB_REF}"',
                 "--raw-field=state=open",
@@ -83,25 +80,23 @@ class CodeAnalysisWorkflowConfigFile(WorkflowConfigFile):
             env={"GH_TOKEN": self.insert_github_token()},
         )
 
-    def steps_analyze(self) -> list[dict[str, Any]]:
+    def steps_analyze(self) -> tuple[Callable[[], dict[str, Any]], ...]:
         """Return checkout, initialization, and analysis steps."""
-        return [
-            self.step_checkout_repository(),
-            self.step_initialize_codeql(),
-            self.step_analyze_code(),
-        ]
+        return (
+            self.step_checkout_repository,
+            self.step_initialize_codeql,
+            self.step_analyze_code,
+        )
 
     def step_analyze_code(self) -> dict[str, Any]:
         """Run the CodeQL analysis and upload its results."""
         return self.step(
-            self.step_analyze_code,
             uses=self.action_codeql_analyze(),
         )
 
     def step_initialize_codeql(self) -> dict[str, Any]:
         """Initialize CodeQL for the current matrix language."""
         return self.step(
-            self.step_initialize_codeql,
             uses=self.action_codeql_init(),
             with_={
                 "languages": self.insert_expression("matrix.language"),

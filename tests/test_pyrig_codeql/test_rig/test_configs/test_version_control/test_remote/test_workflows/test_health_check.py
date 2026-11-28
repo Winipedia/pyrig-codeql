@@ -13,8 +13,8 @@ class TestHealthCheckWorkflowConfigFile:
 
     def test_job_code_analysis(self) -> None:
         """Test method."""
-        job = HealthCheckWorkflowConfigFile.I.job_code_analysis()
-        assert job["job_id"] == "code-analysis"
+        workflow = HealthCheckWorkflowConfigFile.I
+        job = workflow.job_as_dict(workflow.job_code_analysis)["code-analysis"]
         assert job["name"] == "Code Analysis"
         assert job["uses"] == "$/.github/workflows/code-analysis.yml"
         assert job["permissions"] == CodeAnalysisWorkflowConfigFile.I.permissions_used()

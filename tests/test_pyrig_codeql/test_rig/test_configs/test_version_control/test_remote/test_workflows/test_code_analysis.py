@@ -36,7 +36,7 @@ class TestCodeAnalysisWorkflowConfigFile:
         """Test method."""
         workflow = CodeAnalysisWorkflowConfigFile.I
         job = workflow.job_analyze()
-        assert job["job_id"] == "analyze"
+        assert "analyze" in workflow.job_as_dict(workflow.job_analyze)
         assert job["runs-on"] == "ubuntu-latest"
         assert job["timeout-minutes"] == 90  # noqa: PLR2004
         assert job["strategy"]["matrix"]["language"] == ["python", "actions"]
@@ -51,11 +51,11 @@ class TestCodeAnalysisWorkflowConfigFile:
         """Test method."""
         workflow = CodeAnalysisWorkflowConfigFile.I
         job = workflow.job_check_alerts()
-        assert job["job_id"] == "check-alerts"
+        assert "check-alerts" in workflow.job_as_dict(workflow.job_check_alerts)
         assert job["timeout-minutes"] == 5  # noqa: PLR2004
         assert job["needs"] == ["analyze"]
         assert job["permissions"] == workflow.permissions_job_check_alerts()
-        assert job["steps"] == workflow.steps_check_alerts()
+        assert job["steps"] == workflow.steps_configs(workflow.steps_check_alerts())
 
     def test_jobs(self) -> None:
         """Test method."""
@@ -111,7 +111,8 @@ class TestCodeAnalysisWorkflowConfigFile:
     def test_steps_analyze(self) -> None:
         """Test method."""
         workflow = CodeAnalysisWorkflowConfigFile.I
-        assert [step["id"] for step in workflow.steps_analyze()] == [
+        steps = workflow.steps_configs(workflow.steps_analyze())
+        assert [step["id"] for step in steps] == [
             "checkout-repository",
             "initialize-codeql",
             "analyze-code",
@@ -120,7 +121,7 @@ class TestCodeAnalysisWorkflowConfigFile:
     def test_steps_check_alerts(self) -> None:
         """Test method."""
         workflow = CodeAnalysisWorkflowConfigFile.I
-        assert workflow.steps_check_alerts() == [workflow.step_check_alerts()]
+        assert workflow.steps_check_alerts() == (workflow.step_check_alerts,)
 
     def test_workflow_triggers(self) -> None:
         """Test method."""
