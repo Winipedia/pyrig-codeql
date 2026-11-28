@@ -18,7 +18,7 @@ class TestCodeAnalysisWorkflowConfigFile:
         """Test method."""
         workflow = CodeAnalysisWorkflowConfigFile.I
         assert workflow.action_codeql_analyze() == tuple(
-            resource_content("ACTION_CODEQL_ANALYZE", resources).splitlines(),
+            resource_content("action_codeql_analyze", resources).splitlines(),
         )
         action, ref, tag = workflow.action_codeql_analyze()
         assert f'"uses": "{action}@{ref}"  # {tag}' in read_text_utf8(workflow.path())
@@ -27,7 +27,7 @@ class TestCodeAnalysisWorkflowConfigFile:
         """Test method."""
         workflow = CodeAnalysisWorkflowConfigFile.I
         assert workflow.action_codeql_init() == tuple(
-            resource_content("ACTION_CODEQL_INIT", resources).splitlines(),
+            resource_content("action_codeql_init", resources).splitlines(),
         )
         action, ref, tag = workflow.action_codeql_init()
         assert f'"uses": "{action}@{ref}"  # {tag}' in read_text_utf8(workflow.path())
